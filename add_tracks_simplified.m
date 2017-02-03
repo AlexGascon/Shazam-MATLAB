@@ -1,4 +1,4 @@
-function s = add_tracks(filename,d)
+function s = add_tracks_simplified(filename,d, id_offset)
 
 %% add_tracks - Analyzes songs and stores its hashes in a database.
 %
@@ -18,6 +18,9 @@ function s = add_tracks(filename,d)
 % add_tracks will output a [#songs, 6] cell containing all the info of each one of 
 % the songs stored. Besides, it will fill the db with them. 
 %
+% id_offset indica a partir de qué número hay que empezar a contar el id de
+% las canciones que se añadan
+%
 % @author: Alex Gascon y Mireia Segovia
 
 %% CHANGELOG 
@@ -27,13 +30,14 @@ function s = add_tracks(filename,d)
 % Preparing the variables
 detalles = textread(filename,'%s');
 l = length(detalles);
-dilate_size = [30, 30];
-s = cell(l, 6);
+dilate_size = [20, 20];
 
+
+
+s = cell(l, 1);
 % Reading the file and obtaining the song information
 for i = 1:l
-    sROW = strsplit(detalles{i}, '---');
-    s(i,:) = sROW;
+    s{i,:} = detalles{i};
 end
 
 % Processing the songs
@@ -46,7 +50,7 @@ for i = 1:l
     
     % Finding the landmarks and storing its hashes in the database
     [L, ~, ~] = find_landmarks(c8000, dilate_size);
-    H = landmark2hash(L, i);
+    H = landmark2hash(L, i + id_offset);
     record_hashes(H,d);
 
     % Control output, used so we can check that everything is going well

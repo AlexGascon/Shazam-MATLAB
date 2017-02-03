@@ -1,4 +1,4 @@
-function [song, offset] = match_query(query, database, canciones, reproducir)
+function [song, offset] = match_query_simplified(query, database, canciones)
 
 %% match_query - Guesses the given song 
 %
@@ -123,7 +123,7 @@ maxesExamined = 10;
 
 % If there are less than maxesExamined songs with collision, we'll examine
 % all of them
-maxesExamined = min(maxesExamined, length(UniqueTrackCountIndex)-1);
+maxesExamined = min(maxesExamined, length(UniqueTrackCountIndex));
 
 % Reserving memory space for the song-time coincidences histogram
 R = zeros(maxesExamined,3);
@@ -162,36 +162,19 @@ R = sortrows(R, -3);
 song = R(1,1);
 offset = R(1,2);
 
-% TOLERANCE: If the most commmon match isn't, at least, toleranceRatio times as occurrent 
+% TOLERANCE: If the most commmon match isn't, at least, toleranceRatio times more occurrent 
 % than the second most common one, it will conclude that any song matches the query.
 % Nonetheless, it will mention the two most probable matches.
 toleranceRatio = 2;
-if(R(1,3)/R(2,3) < toleranceRatio)
-    disp(sprintf('No hay ninguna canción dominante. Las más probables son %s y %s', ...
-        canciones{song}(1:end-4), canciones{R(2,1)}(1:end-4)))
+% if(R(1,3)/R(2,3) < toleranceRatio)
+%     disp(sprintf('No hay ninguna canción dominante. Las más probables son %s y %s', ...
+%         canciones{song}(1:end-4), canciones{R(2,1)}(1:end-4)))
 
 
-% If it has found a probable enough coincidence, it will give all the info about
-% its title, author, album and releasing year. 
-%
-% Moreover, if reproducir = 1, it will also show the album cover and the lyrics,
-% and will play the song.
-else
-    if(reproducir) [y, Fs] = audioread(canciones{song,1}); 
-    portada = imread(canciones{song,5});
-    letra = textread(canciones{song,6},'%s');
-    end
-
-    grupo = canciones{song, 2};
-    disco = canciones{song, 3};
-    anyo = canciones{song, 4};
-    disp(sprintf('El fragmento analizado pertenece a %s, una canción del grupo %s perteneciente al disco %s y publicada en el año %s',...
-       canciones{song,1}(1:end-4), grupo, disco, anyo))
-
-    if(reproducir)
-    imshow(portada);
-    disp(letra);
-    sound(y, Fs); end
+% If it has found a probable enough coincidence, it will show the song's
+% title
+%else
+     disp(sprintf('El fragmento analizado pertenece a %s', canciones{song,1}(1:end-4)))
 end
 
 
